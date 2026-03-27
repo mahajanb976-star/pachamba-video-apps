@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<body style="background:black;color:white;text-align:center">
+
+<h2>🌐 Pachamba Video Hub</h2>
+
+<div id="login">
+<input id="u" placeholder="Username"><br>
+<input id="p" type="password" placeholder="Password"><br>
+<button onclick="login()">Login</button>
+</div>
+
+<div id="app" style="display:none">
+<input type="file" id="f">
+<button onclick="upload()">Upload</button>
+<div id="videos"></div>
+</div>
+
+<script>
+async function login(){
+let r=await fetch('/login',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({username:u.value,password:p.value})
+});
+let d=await r.json();
+if(d.success){login.style.display='none';app.style.display='block';load();}
+}
+
+async function upload(){
+let fd=new FormData();
+fd.append("video",f.files[0]);
+await fetch('/upload',{method:'POST',body:fd});
+load();
+}
+
+async function load(){
+let r=await fetch('/videos');
+let d=await r.json();
+videos.innerHTML="";
+d.forEach(v=>{
+videos.innerHTML+=`<video src="/video/${v}" controls width=200></video>`;
+});
+}
+</script>
+
+</body>
+</html>
